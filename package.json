@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "jest": "^27.5.1"
+  },
+  "dependencies": {
+    "underscore": "^1.13.6"
   }
 }

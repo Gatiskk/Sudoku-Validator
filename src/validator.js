@@ -6,92 +6,77 @@ class Validator {
     return validator.validate(sudoku)
   }
 
-validate(sudoku) {
+  validate(sudoku) {
 
-  //VALID SUDOKU BOARD
-  const board =
-  [["5","3","4","6","7","8","9","1","2"]
-  ,["6","7","2","1","9","5","3","4","8"]
-  ,["1","9","8","3","4","2","5","6","7"]
-  ,["8","5","9","7","6","1","4","2","3"]
-  ,["4","2","6","8","5","3","7","9","1"]
-  ,["7","1","3","9","2","4","8","5","6"]
-  ,["9","6","1","5","3","7","2","8","4"]
-  ,["2","8","7","4","1","9","6","3","5"]
-  ,["3","4","5","2","8","6","1","7","9"]];
-
-  //INVALID SUDOKU BOARD
-  const board2 =
-  [["3","3","4","6","7","8","9","1","2"]
-  ,["3","7","2","1","9","5","3","4","8"]
-  ,["1","9","8","3","4","2","5","6","7"]                  
-  ,["8","5","9","7","6","1","4","2","3"]
-  ,["4","2","6","8","5","3","7","9","1"]
-  ,["7","1","3","9","2","4","8","5","6"]
-  ,["9","6","1","5","3","7","2","8","4"]
-  ,["2","8","7","4","1","9","6","3","5"]
-  ,["3","4","5","2","8","6","1","7","9"]];
-
-  //VALID SUDOKU BOARD, BUT NOT COMPLETED
-  const board3 =
-  [["0","0","4","6","7","8","9","1","2"]
-  ,["6","7","2","1","9","5","3","4","8"]
-  ,["1","9","8","3","4","2","5","6","7"]                  
-  ,["8","5","9","7","6","1","4","2","3"]
-  ,["4","2","6","8","5","3","7","9","1"]
-  ,["7","1","3","9","2","4","8","5","6"]
-  ,["9","6","1","5","3","7","2","8","4"]
-  ,["2","8","7","4","1","9","6","3","5"]
-  ,["3","4","5","2","8","6","1","7","9"]];
-
-  //SUDOKU BOARD WITH WRONG VALUE
-  const board4 =
-  [["99","3","4","6","7","8","9","1","2"]
-  ,["6","7","2","1","9","5","3","4","8"]
-  ,["1","9","8","3","4","2","5","6","7"]
-  ,["8","5","9","7","6","1","4","2","3"]
-  ,["4","2","6","8","5","3","7","9","1"]
-  ,["7","1","3","9","2","4","8","5","6"]
-  ,["9","6","1","5","3","7","2","8","4"]
-  ,["2","8","7","4","1","9","6","3","5"]
-  ,["3","4","5","2","8","6","1","7","9"]];
+let myArray =  sudoku.split(/\r?\n/);
+myArray.splice(3,1)
+myArray.splice(6,1)
+const newArr = myArray.map((element) => {
+  return element.replace('|', '')
+});
+const newArr2 = newArr.map((element) => {
+  return element.replace('|', '')
+});
+const newArr3 = newArr2.map((element) => {
+  return element.split(' ');
+});
+//console.log(value)
   
+function isValidSudoku(board) {
+  let store = {
+    rows: {},
+    cols: {},
+    square: {},
+  };
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      const box = board[i][j];
+      if(box > 9){
+        return "Sudoku is invalid."
+      }
 
-  function oneSetValidSudoku(board) {
-    let set = new Set()
-    
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[0].length; j++) {
-            const value = board[i][j]
-              if(value === "0"){
-                return "Sudoku is valid but incomplete."
-              } 
-              if(value <= 9 && value >= 1){
-                if (value !== ".") {
-                  const row = `${value} at row ${i}`
-                  const column = `${value} at column ${j}`
-                  const box = `${value} at box ${Math.floor(i/3)}, ${Math.floor(j/3)}`
-                  //console.log(`${row}, ${column}, ${box}`)
-                  if (set.has(row) || set.has(column) || set.has(box)) {
-                      return 'Sudoku is invalid.'
-                  } else {
-                      set.add(row)
-                      set.add(column)
-                      set.add(box)
-                  }
-            }
-        } else {
-          return 'Sudoku is invalid. Wrong values'
-        }
+      if (!store["rows"][i] && box !== "0") {
+        store["rows"][i] = [];
+        store["rows"][i].push(box);
+      } else if (box !== "0" && !store["rows"][i].includes(box)) {
+        store["rows"][i].push(box);
+      } else if (store["rows"][i] && store["rows"][i].includes(box)) {
+        return "Sudoku is invalid.";
+      }
+
+      if (!store["cols"][j] && box !== "0") {
+        store["cols"][j] = [];
+        store["cols"][j].push(box);
+      } else if (box !== "0" && !store["cols"][j].includes(box)) {
+        store["cols"][j].push(box);
+      } else if (store["cols"][j] && store["cols"][j].includes(box)) {
+        return "Sudoku is invalid.";
+      }
+
+      const squareRowId = Math.ceil((i + 1) / 3);
+      const squareColId = Math.ceil((j + 1) / 3);
+      const squareId = `${squareRowId}-${squareColId}`;
+
+      if (!store["square"][squareId] && box !== "0") {
+        store["square"][squareId] = [];
+        store["square"][squareId].push(box);
+      } else if (box !== "0" && !store["square"][squareId].includes(box)) {
+        store["square"][squareId].push(box);
+      } else if (
+        store["square"][squareId] &&
+        store["square"][squareId].includes(box)
+      ) {
+        return "Sudoku is invalid.";
+      }
+      if (box == "0" || !store["square"][squareId].includes(box)){
+        return "Sudoku is valid but incomplete."
+      }
     }
-    return 'Sudoku is valid.'
   }
-  }
-              
-  //return oneSetValidSudoku(board)
-  //return oneSetValidSudoku(board2)
-  //return oneSetValidSudoku(board3)
-  return oneSetValidSudoku(board4)
+  return "Sudoku is valid.";
+}
+return isValidSudoku(newArr3)
 }
 }
+
 module.exports = Validator
